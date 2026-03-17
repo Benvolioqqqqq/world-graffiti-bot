@@ -1,0 +1,5 @@
+.venv/
+graffiti.db
+photos/
+__pycache__/
+.idea/
