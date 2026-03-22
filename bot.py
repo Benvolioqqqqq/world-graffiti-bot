@@ -71,14 +71,14 @@ class SearchGraffiti(StatesGroup):
 
 
 # Все возможные тексты кнопок для фильтров
-MAP_TEXTS = {"🗺 Карта", "🗺 Map", "🗺 რუკა", "/map"}
-ADD_TEXTS = {"➕ Добавить граффити", "➕ Add graffiti", "➕ გრაფიტის დამატება", "/add"}
-SEARCH_TEXTS = {"🔍 Поиск", "🔍 Search", "🔍 ძიება", "/search"}
-CANCEL_TEXTS = {"❌ Отмена", "❌ Cancel", "❌ გაუქმება"}
-MANAGE_TEXTS = {"⚙️ Управление", "⚙️ Manage", "⚙️ მართვა"}
-LANGUAGE_TEXTS = {"🌐 Язык", "🌐 Language", "🌐 ენა"}
-STATS_TEXTS = {"📊 Статистика", "📊 Stats", "📊 სტატისტიკა"}
-GALLERY_TEXTS = {"🖼 Галерея", "🖼 Gallery", "🖼 გალერეა"}
+MAP_TEXTS = {"🗺 Карта", "🗺 Map", "🗺 რუკა", "🗺 Mapa", "🗺 Carte", "🗺 Karte", "/map"}
+ADD_TEXTS = {"➕ Добавить граффити", "➕ Add graffiti", "➕ გრაფიტის დამატება", "➕ Añadir graffiti", "➕ Ajouter un graffiti", "➕ Graffiti hinzufügen", "/add"}
+SEARCH_TEXTS = {"🔍 Поиск", "🔍 Search", "🔍 ძიება", "🔍 Buscar", "🔍 Rechercher", "🔍 Suchen", "/search"}
+CANCEL_TEXTS = {"❌ Отмена", "❌ Cancel", "❌ გაუქმება", "❌ Cancelar", "❌ Annuler", "❌ Abbrechen"}
+MANAGE_TEXTS = {"⚙️ Управление", "⚙️ Manage", "⚙️ მართვა", "⚙️ Gestionar", "⚙️ Gérer", "⚙️ Verwalten"}
+LANGUAGE_TEXTS = {"🌐 Язык", "🌐 Language", "🌐 ენა", "🌐 Idioma", "🌐 Langue", "🌐 Sprache"}
+STATS_TEXTS = {"📊 Статистика", "📊 Stats", "📊 სტატისტიკა", "📊 Estadísticas", "📊 Statistiques", "📊 Statistiken"}
+GALLERY_TEXTS = {"🖼 Галерея", "🖼 Gallery", "🖼 გალერეა", "🖼 Galería", "🖼 Galerie", "🖼 Galerie"}
 
 
 # Команда /start
@@ -96,9 +96,12 @@ async def choose_language(message: types.Message):
     uid = message.from_user.id
     lang_keyboard = InlineKeyboardMarkup(
         inline_keyboard=[
-            [InlineKeyboardButton(text="🇷🇺 Русский", callback_data="lang_ru")],
-            [InlineKeyboardButton(text="🇬🇧 English", callback_data="lang_en")],
-            [InlineKeyboardButton(text="🇬🇪 ქართული", callback_data="lang_ka")]
+            [InlineKeyboardButton(text="🇬🇧 English", callback_data="lang_en"),
+             InlineKeyboardButton(text="🇪🇸 Español", callback_data="lang_es")],
+            [InlineKeyboardButton(text="🇫🇷 Français", callback_data="lang_fr"),
+             InlineKeyboardButton(text="🇩🇪 Deutsch", callback_data="lang_de")],
+            [InlineKeyboardButton(text="🇷🇺 Русский", callback_data="lang_ru"),
+             InlineKeyboardButton(text="🇬🇪 ქართული", callback_data="lang_ka")]
         ]
     )
     await message.answer(get_text(uid, "choose_language"), reply_markup=lang_keyboard)
@@ -229,7 +232,7 @@ async def get_location_wrong(message: types.Message):
 async def get_author(message: types.Message, state: FSMContext):
     uid = message.from_user.id
     author = message.text.strip()
-    no_words = {"нет", "no", "არა"}
+    no_words = {"нет", "no", "არა", "non", "nein"}
     if author.lower() in no_words:
         author = get_text(uid, "unknown_author")
     await state.update_data(author=author)
@@ -241,7 +244,7 @@ async def get_author(message: types.Message, state: FSMContext):
 async def get_date(message: types.Message, state: FSMContext):
     uid = message.from_user.id
     date = message.text.strip()
-    no_words = {"нет", "no", "არა"}
+    no_words = {"нет", "no", "არა", "non", "nein"}
     if date.lower() in no_words:
         date = get_text(uid, "unknown_date")
     await state.update_data(date=date)
@@ -253,7 +256,7 @@ async def get_date(message: types.Message, state: FSMContext):
 async def get_description(message: types.Message, state: FSMContext):
     uid = message.from_user.id
     description = message.text.strip()
-    no_words = {"нет", "no", "არა"}
+    no_words = {"нет", "no", "არა", "non", "nein"}
     if description.lower() in no_words:
         description = ""
 
