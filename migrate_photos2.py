@@ -3,7 +3,7 @@ import sqlite3
 from aiogram import Bot
 from aiogram.types import FSInputFile
 
-NEW_BOT_TOKEN = "8715244020:AAHdbZgTBoMwW5rydf20pmhwRviOdDukjjY"
+NEW_BOT_TOKEN = ""
 ADMIN_ID = 516580829
 
 async def migrate():

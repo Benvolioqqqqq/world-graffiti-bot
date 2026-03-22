@@ -310,6 +310,15 @@ async def approve(callback: types.CallbackQuery):
     await callback.answer("Одобрено!")
     # Обновляем карту
     await generate_map(bot)
+    # Публикуем в канал
+    try:
+        await bot.send_photo(
+            chat_id="@graffiti_map",
+            photo=callback.message.photo[-1].file_id,
+            caption=callback.message.caption.replace("\n\n✅ ОДОБРЕНО", "") + "\n\n🗺 @graffiti_map_bot"
+        )
+    except Exception as e:
+        print(f"Channel post error: {e}")
 
 
 @dp.callback_query(F.data.startswith("reject_"))
