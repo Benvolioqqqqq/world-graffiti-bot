@@ -338,6 +338,8 @@ async def reject(callback: types.CallbackQuery):
 
 
 # Управление
+PAGE_SIZE = 10
+
 @dp.message(F.text.in_(MANAGE_TEXTS))
 async def manage_graffiti(message: types.Message):
     uid = message.from_user.id
@@ -351,9 +353,19 @@ async def manage_graffiti(message: types.Message):
         await message.answer(get_text(uid, "no_graffiti"), reply_markup=kb)
         return
 
-    await message.answer(get_text(uid, "graffiti_count").format(len(graffiti_list)))
+    await send_graffiti_page(message, uid, graffiti_list, page=0)
 
-    for item in graffiti_list:
+
+async def send_graffiti_page(message, uid, graffiti_list, page: int):
+    total = len(graffiti_list)
+    total_pages = (total + PAGE_SIZE - 1) // PAGE_SIZE
+    start = page * PAGE_SIZE
+    end = min(start + PAGE_SIZE, total)
+    page_items = graffiti_list[start:end]
+
+    await message.answer(f"📋 Граффити {start+1}–{end} из {total} (страница {page+1}/{total_pages})")
+
+    for item in page_items:
         g_id, lat, lon, photo_id, author, date, description, added_by, created_at, status = item
         text = (
             f"ID: {g_id}\n"
@@ -370,6 +382,26 @@ async def manage_graffiti(message: types.Message):
             await message.answer_photo(photo=photo_id, caption=text, reply_markup=keyboard)
         else:
             await message.answer(text, reply_markup=keyboard)
+
+    # Кнопки навигации
+    nav_buttons = []
+    if page > 0:
+        nav_buttons.append(InlineKeyboardButton(text="◀️ Назад", callback_data=f"manage_page_{page-1}"))
+    if page < total_pages - 1:
+        nav_buttons.append(InlineKeyboardButton(text="Вперёд ▶️", callback_data=f"manage_page_{page+1}"))
+
+    if nav_buttons:
+        nav_kb = InlineKeyboardMarkup(inline_keyboard=[nav_buttons])
+        await message.answer(f"Страница {page+1} из {total_pages}", reply_markup=nav_kb)
+
+
+@dp.callback_query(F.data.startswith("manage_page_"))
+async def manage_page_callback(callback: types.CallbackQuery):
+    page = int(callback.data.split("_")[-1])
+    uid = callback.from_user.id
+    graffiti_list = get_all_graffiti()
+    await callback.answer()
+    await send_graffiti_page(callback.message, uid, graffiti_list, page=page)
 
 
 @dp.callback_query(F.data.startswith("delete_"))
