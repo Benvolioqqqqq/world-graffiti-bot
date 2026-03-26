@@ -3,7 +3,7 @@ from aiogram import Bot, Dispatcher, types, F
 from aiogram.filters import CommandStart
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
-from database import init_db, add_graffiti, get_all_graffiti, get_pending_graffiti, update_status, search_graffiti, delete_graffiti, get_stats, save_user, get_users_count, toggle_reaction, get_reactions_count, get_top_liked
+from database import init_db, add_graffiti, get_all_graffiti, get_pending_graffiti, update_status, search_graffiti, delete_graffiti, get_stats, save_user, get_users_count, toggle_reaction, get_reactions_count, get_top_liked, get_all_users, set_display_name, get_display_name
 from map_generator import generate_map
 from aiogram.types import FSInputFile
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
@@ -461,15 +461,27 @@ async def show_stats(message: types.Message):
         text += get_text(uid, "top_users")
         medals = ["🥇", "🥈", "🥉"]
         for i, (user, count) in enumerate(stats["top_users"]):
-            medal = medals[i] if i < 3 else f"{i+1}."
-            if user and not user.startswith("@"):
+            if i < 3:
+                medal = f" {medals[i]} "
+            else:
+                medal = f" {i + 1}.  "
+
+            # Проверяем кастомный ник
+            custom_name = None
+            if user and user.isdigit():
+                custom_name = get_display_name(int(user))
+
+            if custom_name:
+                user_display = custom_name
+            elif user and not user.startswith("@"):
                 if not user.isdigit():
                     user_display = f"@{user}"
                 else:
                     user_display = user
             else:
-                user_display = user or "Аноним"
-            text += f"\n{medal} {user_display} — {count}"
+                user_display = user or "Anonymous"
+
+            text += f"\n{medal}{user_display} — {count}"
 
 
 
@@ -504,6 +516,40 @@ def get_gallery_keyboard(index, total, graffiti_id):
             ]
         ]
     )
+
+
+@dp.message(F.text.startswith("/notify"))
+async def notify_users(message: types.Message):
+    if message.from_user.id != ADMIN_ID:
+        return
+
+    notify_text = message.text.replace("/notify ", "", 1).replace("/notify", "").strip()
+    if not notify_text:
+        await message.answer("Usage: /notify Your message here")
+        return
+
+    users = get_all_users()
+    sent = 0
+    for user_id in users:
+        try:
+            await bot.send_message(user_id, notify_text)
+            sent += 1
+        except:
+            pass
+
+    await message.answer(f"Sent to {sent}/{len(users)} users")
+
+
+@dp.message(F.text.startswith("/setname"))
+async def set_name(message: types.Message):
+    uid = message.from_user.id
+    name = message.text.replace("/setname ", "", 1).replace("/setname", "").strip()
+    if not name:
+        await message.answer("Usage: /setname @your_channel\n\nThis name will be shown in the leaderboard instead of your username.")
+        return
+    set_display_name(uid, name)
+    await message.answer(f"✅ Display name set: {name}")
+
 
 async def main():
     init_db()

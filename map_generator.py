@@ -87,11 +87,19 @@ def make_popup_html(img_base64, author, date, description, reactions=None):
     '''
 
 
+def get_all_users():
+    conn = sqlite3.connect("graffiti.db")
+    cursor = conn.cursor()
+    cursor.execute("SELECT user_id FROM users")
+    rows = cursor.fetchall()
+    conn.close()
+    return [row[0] for row in rows]
+
 async def generate_map(bot: Bot):
     world_map = folium.Map(
         location=[20, 0],
         zoom_start=3,
-        tiles="CartoDB positron"
+        tiles="OpenStreetMap"
     )
 
     marker_cluster = MarkerCluster(

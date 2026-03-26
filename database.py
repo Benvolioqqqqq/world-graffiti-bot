@@ -34,6 +34,10 @@ def init_db():
                 PRIMARY KEY (user_id, graffiti_id)
             )
         """)
+    try:
+        cursor.execute("ALTER TABLE users ADD COLUMN display_name TEXT")
+    except:
+        pass
     conn.commit()
     conn.close()
 
@@ -102,7 +106,7 @@ def get_stats():
     cursor.execute("""
         SELECT added_by, COUNT(*) as cnt 
         FROM graffiti WHERE status = 'approved' 
-        GROUP BY added_by ORDER BY cnt DESC LIMIT 5
+        GROUP BY added_by ORDER BY cnt DESC LIMIT 10
     """)
     top_users = cursor.fetchall()
     conn.close()
@@ -205,3 +209,18 @@ def get_all_reactions():
         if reaction in result[g_id]:
             result[g_id][reaction] = count
     return result
+
+def set_display_name(user_id, name):
+    conn = sqlite3.connect("graffiti.db")
+    cursor = conn.cursor()
+    cursor.execute("UPDATE users SET display_name = ? WHERE user_id = ?", (name, user_id))
+    conn.commit()
+    conn.close()
+
+def get_display_name(user_id):
+    conn = sqlite3.connect("graffiti.db")
+    cursor = conn.cursor()
+    cursor.execute("SELECT display_name FROM users WHERE user_id = ?", (user_id,))
+    row = cursor.fetchone()
+    conn.close()
+    return row[0] if row and row[0] else None
