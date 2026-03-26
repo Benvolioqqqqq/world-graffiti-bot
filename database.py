@@ -224,3 +224,11 @@ def get_display_name(user_id):
     row = cursor.fetchone()
     conn.close()
     return row[0] if row and row[0] else None
+
+def get_all_users():
+    conn = sqlite3.connect("graffiti.db")
+    cursor = conn.cursor()
+    cursor.execute("SELECT user_id FROM users")
+    rows = cursor.fetchall()
+    conn.close()
+    return [row[0] for row in rows]
