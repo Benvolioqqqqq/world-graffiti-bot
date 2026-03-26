@@ -232,3 +232,12 @@ def get_all_users():
     rows = cursor.fetchall()
     conn.close()
     return [row[0] for row in rows]
+
+
+def get_display_name_by_username(username):
+    conn = sqlite3.connect("graffiti.db")
+    cursor = conn.cursor()
+    cursor.execute("SELECT display_name FROM users WHERE username = ?", (username,))
+    row = cursor.fetchone()
+    conn.close()
+    return row[0] if row and row[0] else None

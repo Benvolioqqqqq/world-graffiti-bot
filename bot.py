@@ -3,7 +3,7 @@ from aiogram import Bot, Dispatcher, types, F
 from aiogram.filters import CommandStart
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
-from database import init_db, add_graffiti, get_all_graffiti, get_pending_graffiti, update_status, search_graffiti, delete_graffiti, get_stats, save_user, get_users_count, toggle_reaction, get_reactions_count, get_top_liked, get_all_users, set_display_name, get_display_name
+from database import init_db, add_graffiti, get_all_graffiti, get_pending_graffiti, update_status, search_graffiti, delete_graffiti, get_stats, save_user, get_users_count, toggle_reaction, get_reactions_count, get_top_liked, get_all_users, set_display_name, get_display_name, get_display_name_by_username
 from map_generator import generate_map
 from aiogram.types import FSInputFile
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
@@ -462,14 +462,12 @@ async def show_stats(message: types.Message):
         medals = ["🥇", "🥈", "🥉"]
         for i, (user, count) in enumerate(stats["top_users"]):
             if i < 3:
-                medal = f" {medals[i]} "
+                medal = medals[i]
             else:
-                medal = f" {i + 1}.  "
+                medal = f"{i + 1}."
 
             # Проверяем кастомный ник
-            custom_name = None
-            if user and user.isdigit():
-                custom_name = get_display_name(int(user))
+            custom_name = get_display_name_by_username(user)
 
             if custom_name:
                 user_display = custom_name
@@ -481,7 +479,7 @@ async def show_stats(message: types.Message):
             else:
                 user_display = user or "Anonymous"
 
-            text += f"\n{medal}{user_display} — {count}"
+            text += f"\n{medal} {user_display} — {count}"
 
 
 
