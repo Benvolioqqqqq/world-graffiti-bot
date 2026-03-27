@@ -41,6 +41,11 @@ def init_db():
     conn.commit()
     conn.close()
 
+    try:
+        cursor.execute("ALTER TABLE graffiti ADD COLUMN city TEXT")
+    except:
+        pass
+
 def add_graffiti(latitude, longitude, photo_id, author, date, description, added_by):
     conn = sqlite3.connect("graffiti.db")
     cursor = conn.cursor()
@@ -241,3 +246,11 @@ def get_display_name_by_username(username):
     row = cursor.fetchone()
     conn.close()
     return row[0] if row and row[0] else None
+
+
+def update_city(graffiti_id, city):
+    conn = sqlite3.connect("graffiti.db")
+    cursor = conn.cursor()
+    cursor.execute("UPDATE graffiti SET city = ? WHERE id = ?", (city, graffiti_id))
+    conn.commit()
+    conn.close()

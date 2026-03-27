@@ -1,3 +1,4 @@
 aiogram
 folium
 aiohttp
+reverse_geocoder

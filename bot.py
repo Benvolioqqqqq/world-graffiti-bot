@@ -1,9 +1,10 @@
 import asyncio
+import reverse_geocoder as rg
 from aiogram import Bot, Dispatcher, types, F
 from aiogram.filters import CommandStart
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
-from database import init_db, add_graffiti, get_all_graffiti, get_pending_graffiti, update_status, search_graffiti, delete_graffiti, get_stats, save_user, get_users_count, toggle_reaction, get_reactions_count, get_top_liked, get_all_users, set_display_name, get_display_name, get_display_name_by_username
+from database import init_db, add_graffiti, get_all_graffiti, get_pending_graffiti, update_status, search_graffiti, delete_graffiti, get_stats, save_user, get_users_count, toggle_reaction, get_reactions_count, get_top_liked, get_all_users, set_display_name, get_display_name, get_display_name_by_username, update_city
 from map_generator import generate_map
 from aiogram.types import FSInputFile
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
@@ -173,13 +174,14 @@ async def search_results(message: types.Message, state: FSMContext):
     await message.answer(get_text(uid, "search_found").format(len(results)))
 
     for item in results:
-        g_id, lat, lon, photo_id, author, date, description, added_by, created_at, status = item
+        city = item[10] if len(item) > 10 and item[10] else f"{lat}, {lon}"
         text = (
             f"🎨 {author}\n"
             f"📅 {date}\n"
             f"📝 {description or get_text(uid, 'no_description')}\n"
-            f"📍 {lat}, {lon}"
+            f"📍 {city}"
         )
+
         counts = get_reactions_count(g_id)
         reaction_keyboard = get_reaction_keyboard(g_id, counts)
         if photo_id:
@@ -271,6 +273,14 @@ async def get_description(message: types.Message, state: FSMContext):
         description=description,
         added_by=message.from_user.username or message.from_user.full_name
     )
+
+    # Определяем город
+    try:
+        result = rg.search((data["latitude"], data["longitude"]))
+        city = f"{result[0]['name']}, {result[0]['cc']}"
+        update_city(graffiti_id, city)
+    except:
+        city = ""
 
     kb = get_admin_keyboard(uid) if uid == ADMIN_ID else get_main_keyboard(uid)
     await message.answer(get_text(uid, "added"), reply_markup=kb)
@@ -627,13 +637,14 @@ async def gallery_start(message: types.Message):
         return
 
     item = graffiti_list[0]
-    g_id, lat, lon, photo_id, author, date, description, added_by, created_at, status = item
+    city = item[10] if len(item) > 10 and item[10] else f"{lat}, {lon}"
     text = (
         f"🎨 {author}\n"
         f"📅 {date}\n"
         f"📝 {description or get_text(uid, 'no_description')}\n"
-        f"📍 {lat}, {lon}"
+        f"📍 {city}"
     )
+
     keyboard = get_gallery_keyboard(0, len(graffiti_list), g_id)
     if photo_id:
         await message.answer_photo(photo=photo_id, caption=text, reply_markup=keyboard)
@@ -660,11 +671,15 @@ async def gallery_navigate(callback: types.CallbackQuery):
     item = graffiti_list[index]
     g_id, lat, lon, photo_id, author, date, description, added_by, created_at, status = item
     text = (
-        f"🎨 {author}\n"
-        f"📅 {date}\n"
-        f"📝 {description or get_text(uid, 'no_description')}\n"
-        f"📍 {lat}, {lon}"
-    )
+            city = item[10] if len(item) > 10 and item[10] else f"{lat}, {lon}"
+            text = (
+                f"🎨 {author}\n"
+                f"📅 {date}\n"
+                f"📝 {description or get_text(uid, 'no_description')}\n"
+                f"📍 {city}"
+            )
+
+
     keyboard = get_gallery_keyboard(index, total, g_id)
 
     try:
