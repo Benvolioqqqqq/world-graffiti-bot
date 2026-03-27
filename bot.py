@@ -649,6 +649,8 @@ async def gallery_start(message: types.Message):
         f"📍 {city}"
     )
 
+    keyboard = get_gallery_keyboard(0, len(graffiti_list), g_id)
+
     if photo_id:
         await message.answer_photo(photo=photo_id, caption=text, reply_markup=keyboard)
     else:
