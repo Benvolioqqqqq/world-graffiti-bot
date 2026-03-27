@@ -133,7 +133,7 @@ async def generate_map(bot: Bot):
     os.makedirs("photos", exist_ok=True)
 
     for item in graffiti_list:
-        g_id, lat, lon, photo_id, author, date, description, added_by, created_at, status = item
+        g_id, lat, lon, photo_id, author, date, description, added_by, created_at, status, city = item
 
         img_base64 = ""
         if photo_id:

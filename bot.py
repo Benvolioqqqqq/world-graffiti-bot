@@ -376,7 +376,7 @@ async def send_graffiti_page(message, uid, graffiti_list, page: int):
     await message.answer(f"📋 Граффити {start+1}–{end} из {total} (страница {page+1}/{total_pages})")
 
     for item in page_items:
-        g_id, lat, lon, photo_id, author, date, description, added_by, created_at, status = item
+        g_id, lat, lon, photo_id, author, date, description, added_by, created_at, status, city = item
         text = (
             f"ID: {g_id}\n"
             f"🎨 {author}\n"
@@ -669,7 +669,7 @@ async def gallery_navigate(callback: types.CallbackQuery):
         index = 0
 
     item = graffiti_list[index]
-    g_id, lat, lon, photo_id, author, date, description, added_by, created_at, status = item
+    g_id, lat, lon, photo_id, author, date, description, added_by, created_at, status, city = item
     text = (
             city = item[10] if len(item) > 10 and item[10] else f"{lat}, {lon}"
             text = (
