@@ -1,5 +1,5 @@
 import sqlite3
-import reverse_geocoder as rg
+
 
 conn = sqlite3.connect("graffiti.db")
 cursor = conn.cursor()

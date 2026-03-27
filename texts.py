@@ -46,6 +46,7 @@ TEXTS = {
         "btn_gallery": "🖼 Галерея",
         "gallery_empty": "Граффити пока нет.",
         "gallery_counter": "{} из {}",
+        "send_city": "🏙 Введите название города (например: Тбилиси, Берлин, Токио):",
     },
     "en": {
         "start": "Hello! I'm the «World Graffiti Map» bot 🌍\n\nChoose an action:",
@@ -94,6 +95,7 @@ TEXTS = {
         "btn_gallery": "🖼 Gallery",
         "gallery_empty": "No graffiti yet.",
         "gallery_counter": "{} of {}",
+        "send_city": "🏙 Enter the city name (e.g. Tbilisi, Berlin, Tokyo):",
     },
     "ka": {
         "start": "გამარჯობა! მე ვარ ბოტი «გრაფიტის მსოფლიო რუკა» 🌍\n\nაირჩიეთ მოქმედება:",
@@ -142,6 +144,7 @@ TEXTS = {
         "btn_gallery": "🖼 გალერეა",
         "gallery_empty": "გრაფიტი ჯერ არ არის.",
         "gallery_counter": "{} / {}",
+        "send_city": "🏙 შეიყვანეთ ქალაქის სახელი (მაგ: თბილისი, ბერლინი, ტოკიო):",
     },
     "es": {
         "start": "¡Hola! Soy el bot «Mapa Mundial de Graffiti» 🌍\n\nElige una acción:",
@@ -190,6 +193,7 @@ TEXTS = {
         "btn_gallery": "🖼 Galería",
         "gallery_empty": "Aún no hay graffiti.",
         "gallery_counter": "{} de {}",
+        "send_city": "🏙 Entre le nom de la ville (ex : Tbilissi, Berlin, Tokyo) :",
     },
     "fr": {
         "start": "Salut ! Je suis le bot «Carte Mondiale du Graffiti» 🌍\n\nChoisis une action :",
@@ -238,6 +242,7 @@ TEXTS = {
         "btn_gallery": "🖼 Galerie",
         "gallery_empty": "Pas encore de graffiti.",
         "gallery_counter": "{} sur {}",
+        "send_city": "🏙 Entre le nom de la ville (ex : Tbilissi, Berlin, Tokyo) :",
     },
     "de": {
         "start": "Hallo! Ich bin der «Welt-Graffiti-Karte» Bot 🌍\n\nWähle eine Aktion:",
@@ -286,6 +291,7 @@ TEXTS = {
         "btn_gallery": "🖼 Galerie",
         "gallery_empty": "Noch kein Graffiti.",
         "gallery_counter": "{} von {}",
+        "send_city": "🏙 Gib den Stadtnamen ein (z.B. Tbilisi, Berlin, Tokio):",
     },
 }
 

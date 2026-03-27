@@ -1,5 +1,4 @@
 import asyncio
-import reverse_geocoder as rg
 from aiogram import Bot, Dispatcher, types, F
 from aiogram.filters import CommandStart
 from aiogram.fsm.context import FSMContext
@@ -62,6 +61,7 @@ def get_admin_keyboard(user_id):
 class AddGraffiti(StatesGroup):
     photo = State()
     location = State()
+    city = State()
     author = State()
     date = State()
     description = State()
@@ -221,8 +221,8 @@ async def get_location(message: types.Message, state: FSMContext):
         latitude=message.location.latitude,
         longitude=message.location.longitude
     )
-    await message.answer(get_text(uid, "send_author"))
-    await state.set_state(AddGraffiti.author)
+    await message.answer(get_text(uid, "send_city"))
+    await state.set_state(AddGraffiti.city)
 
 
 @dp.message(AddGraffiti.location)
@@ -230,6 +230,13 @@ async def get_location_wrong(message: types.Message):
     uid = message.from_user.id
     await message.answer(get_text(uid, "send_location_please"))
 
+@dp.message(AddGraffiti.city)
+async def get_city(message: types.Message, state: FSMContext):
+    uid = message.from_user.id
+    city = message.text.strip()
+    await state.update_data(city=city)
+    await message.answer(get_text(uid, "send_author"))
+    await state.set_state(AddGraffiti.author)
 
 @dp.message(AddGraffiti.author)
 async def get_author(message: types.Message, state: FSMContext):
@@ -275,16 +282,11 @@ async def get_description(message: types.Message, state: FSMContext):
         added_by=message.from_user.username or message.from_user.full_name
     )
 
-    # Определяем город
-    try:
-        result = rg.search((data["latitude"], data["longitude"]))
-        city = f"{result[0]['name']}, {result[0]['cc']}"
-        update_city(graffiti_id, city)
-    except:
-        city = ""
+    from database import update_city
+    update_city(graffiti_id, data["city"])
 
-    kb = get_admin_keyboard(uid) if uid == ADMIN_ID else get_main_keyboard(uid)
-    await message.answer(get_text(uid, "added"), reply_markup=kb)
+
+
 
     # Уведомляем админа
     admin_keyboard = InlineKeyboardMarkup(
