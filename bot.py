@@ -174,7 +174,8 @@ async def search_results(message: types.Message, state: FSMContext):
     await message.answer(get_text(uid, "search_found").format(len(results)))
 
     for item in results:
-        city = item[10] if len(item) > 10 and item[10] else f"{lat}, {lon}"
+        g_id, lat, lon, photo_id, author, date, description, added_by, created_at, status, city = item
+        city = city if city else f"{lat}, {lon}"
         text = (
             f"🎨 {author}\n"
             f"📅 {date}\n"
@@ -637,7 +638,8 @@ async def gallery_start(message: types.Message):
         return
 
     item = graffiti_list[0]
-    city = item[10] if len(item) > 10 and item[10] else f"{lat}, {lon}"
+    g_id, lat, lon, photo_id, author, date, description, added_by, created_at, status, city = item
+    city = city if city else f"{lat}, {lon}"
     text = (
         f"🎨 {author}\n"
         f"📅 {date}\n"
@@ -645,7 +647,6 @@ async def gallery_start(message: types.Message):
         f"📍 {city}"
     )
 
-    keyboard = get_gallery_keyboard(0, len(graffiti_list), g_id)
     if photo_id:
         await message.answer_photo(photo=photo_id, caption=text, reply_markup=keyboard)
     else:
@@ -670,14 +671,13 @@ async def gallery_navigate(callback: types.CallbackQuery):
 
     item = graffiti_list[index]
     g_id, lat, lon, photo_id, author, date, description, added_by, created_at, status, city = item
+    city = city if city else f"{lat}, {lon}"
     text = (
-            city = item[10] if len(item) > 10 and item[10] else f"{lat}, {lon}"
-            text = (
-                f"🎨 {author}\n"
-                f"📅 {date}\n"
-                f"📝 {description or get_text(uid, 'no_description')}\n"
-                f"📍 {city}"
-            )
+        f"🎨 {author}\n"
+        f"📅 {date}\n"
+        f"📝 {description or get_text(uid, 'no_description')}\n"
+        f"📍 {city}"
+    )
 
 
     keyboard = get_gallery_keyboard(index, total, g_id)
