@@ -13,6 +13,8 @@ from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, WebAppInfo
 from texts import get_text, set_language, get_language
 import os
 from dotenv import load_dotenv
+import shutil
+import subprocess
 
 load_dotenv()
 
@@ -129,6 +131,7 @@ async def show_map(message: types.Message):
         return
     if not os.path.exists("map.html"):
         await generate_map(bot)
+    push_map_to_github()
     web_app_button = InlineKeyboardMarkup(
         inline_keyboard=[
             [InlineKeyboardButton(
@@ -561,6 +564,23 @@ async def set_name(message: types.Message):
     set_display_name(uid, name)
     await message.answer(f"✅ Display name set: {name}")
 
+def push_map_to_github():
+    try:
+        token = os.environ.get("GITHUB_TOKEN", "")
+        if not token:
+            return
+        map_path = "/root/world-graffiti-bot/map.html"
+        repo_path = "/root/graffiti-map"
+        shutil.copy(map_path, f"{repo_path}/index.html")
+        subprocess.run(["git", "add", "."], cwd=repo_path)
+        subprocess.run(["git", "commit", "-m", "update map"], cwd=repo_path)
+        subprocess.run(
+            ["git", "push", f"https://Benvolioqqqqq:{token}@github.com/Benvolioqqqqq/graffiti-map.git", "main"],
+            cwd=repo_path
+        )
+        print("Map pushed to GitHub")
+    except Exception as e:
+        print(f"GitHub push error: {e}")
 
 async def main():
     init_db()
@@ -568,6 +588,7 @@ async def main():
     # Генерируем карту при старте
     if get_all_graffiti():
         await generate_map(bot)
+        push_map_to_github()
 
     # Запускаем веб-сервер
     app = create_app()
