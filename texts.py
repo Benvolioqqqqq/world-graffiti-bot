@@ -299,8 +299,8 @@ user_languages = {}
 
 
 def get_text(user_id, key):
-    lang = user_languages.get(user_id, "en")
-    return TEXTS[lang].get(key, TEXTS["en"][key])
+    lang = user_languages.get(user_id, "ru")
+    return TEXTS[lang].get(key, TEXTS["ru"][key])
 
 
 def set_language(user_id, lang):
@@ -308,4 +308,4 @@ def set_language(user_id, lang):
 
 
 def get_language(user_id):
-    return user_languages.get(user_id, "en")
+    return user_languages.get(user_id, "ru")
