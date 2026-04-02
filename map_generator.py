@@ -105,8 +105,9 @@ async def generate_map(bot: Bot):
     marker_cluster = MarkerCluster(
         name="Граффити",
         options={
-            "maxClusterRadius": 30,
-            "disableClusteringAtZoom": 14
+            "maxClusterRadius": 20,
+            "disableClusteringAtZoom": 13,
+            "minimumClusterSize": 10
         }
     ).add_to(world_map)
 
