@@ -1,5 +1,4 @@
 import folium
-from folium.plugins import MarkerCluster
 import base64
 import os
 from io import BytesIO
@@ -102,14 +101,7 @@ async def generate_map(bot: Bot):
         tiles="OpenStreetMap"
     )
 
-    marker_cluster = MarkerCluster(
-        name="Граффити",
-        options={
-            "maxClusterRadius": 20,
-            "disableClusteringAtZoom": 13,
-            "minimumClusterSize": 10
-        }
-    ).add_to(world_map)
+    marker_cluster = world_map
 
     # Загружаем иконку один раз
     icon_base64 = get_marker_icon_base64()
