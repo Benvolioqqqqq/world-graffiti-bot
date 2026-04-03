@@ -5,6 +5,7 @@ from io import BytesIO
 from PIL import Image
 from aiogram import Bot
 from database import get_all_graffiti, get_all_reactions
+from folium.plugins import MarkerCluster
 
 def compress_photo(photo_path, max_width=300, quality=40):
     img = Image.open(photo_path)
@@ -101,7 +102,15 @@ async def generate_map(bot: Bot):
         tiles="OpenStreetMap"
     )
 
-    marker_cluster = world_map
+    marker_cluster = MarkerCluster(
+        name="Граффити",
+        options={
+            "maxClusterRadius": 15,
+            "disableClusteringAtZoom": 14,
+            "spiderfyOnMaxZoom": True,
+            "showCoverageOnHover": False
+        }
+    ).add_to(world_map)
 
     # Загружаем иконку один раз
     icon_base64 = get_marker_icon_base64()
