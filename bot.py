@@ -15,6 +15,7 @@ import os
 from dotenv import load_dotenv
 import shutil
 import subprocess
+import random
 
 load_dotenv()
 
@@ -652,13 +653,17 @@ async def react_graffiti(callback: types.CallbackQuery):
 
 
 @dp.message(F.text.in_(GALLERY_TEXTS))
-async def gallery_start(message: types.Message):
+async def gallery_start(message: types.Message, state: FSMContext):
     uid = message.from_user.id
     graffiti_list = get_all_graffiti()
     if not graffiti_list:
         kb = get_admin_keyboard(uid) if uid == ADMIN_ID else get_main_keyboard(uid)
         await message.answer(get_text(uid, "gallery_empty"), reply_markup=kb)
         return
+
+    random.shuffle(graffiti_list)
+    ids = [item[0] for item in graffiti_list]
+    await state.update_data(gallery_ids=ids)
 
     item = graffiti_list[0]
     g_id, lat, lon, photo_id, author, date, description, added_by, created_at, status, city = item
@@ -669,9 +674,7 @@ async def gallery_start(message: types.Message):
         f"📝 {description or get_text(uid, 'no_description')}\n"
         f"📍 {city}"
     )
-
     keyboard = get_gallery_keyboard(0, len(graffiti_list), g_id)
-
     if photo_id:
         await message.answer_photo(photo=photo_id, caption=text, reply_markup=keyboard)
     else:
@@ -679,13 +682,21 @@ async def gallery_start(message: types.Message):
 
 
 @dp.callback_query(F.data.startswith("gallery_"))
-async def gallery_navigate(callback: types.CallbackQuery):
+async def gallery_navigate(callback: types.CallbackQuery, state: FSMContext):
     if callback.data == "gallery_noop":
         await callback.answer()
         return
 
     uid = callback.from_user.id
+    data = await state.get_data()
+    gallery_ids = data.get("gallery_ids")
+
     graffiti_list = get_all_graffiti()
+
+    if gallery_ids:
+        id_to_item = {item[0]: item for item in graffiti_list}
+        graffiti_list = [id_to_item[gid] for gid in gallery_ids if gid in id_to_item]
+
     total = len(graffiti_list)
     index = int(callback.data.split("_")[1])
 
@@ -703,8 +714,6 @@ async def gallery_navigate(callback: types.CallbackQuery):
         f"📝 {description or get_text(uid, 'no_description')}\n"
         f"📍 {city}"
     )
-
-
     keyboard = get_gallery_keyboard(index, total, g_id)
 
     try:
