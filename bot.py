@@ -540,17 +540,28 @@ async def notify_users(message: types.Message):
 
     notify_text = message.text.replace("/notify ", "", 1).replace("/notify", "").strip()
     if not notify_text:
-        await message.answer("Usage: /notify Your message here")
+        await message.answer("Usage:\n/notify Your message\n\nOr reply to a photo with /notify Your caption")
         return
 
     users = get_all_users()
     sent = 0
-    for user_id in users:
-        try:
-            await bot.send_message(user_id, notify_text)
-            sent += 1
-        except:
-            pass
+
+    # Если это ответ на фото
+    if message.reply_to_message and message.reply_to_message.photo:
+        photo_id = message.reply_to_message.photo[-1].file_id
+        for user_id in users:
+            try:
+                await bot.send_photo(user_id, photo=photo_id, caption=notify_text, parse_mode="HTML")
+                sent += 1
+            except:
+                pass
+    else:
+        for user_id in users:
+            try:
+                await bot.send_message(user_id, notify_text, parse_mode="HTML")
+                sent += 1
+            except:
+                pass
 
     await message.answer(f"Sent to {sent}/{len(users)} users")
 
